@@ -4,14 +4,12 @@ from pathlib import Path
 import json
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
-from nltk.tokenize import RegexpTokenizer
+import re
 
-# -------------------------------
-# Initialisation du tokenizer
-# -------------------------------
-# Utilise une expression régulière simple pour tokeniser les mots.
-# Avantage : ne dépend pas de punkt/punkt_tab (pas besoin de télécharger des packages NLTK supplémentaires)
-tokenizer = RegexpTokenizer(r'\b\w+\b')
+# Simple regex-based tokenizer (no NLTK dependency for Python 3.14 compatibility)
+def simple_tokenize(text):
+    """Simple word tokenizer using regex"""
+    return re.findall(r'\b\w+\b', text.lower())
 
 
 # -------------------------------
@@ -41,12 +39,12 @@ def extract_from_text(file_path):
             original_text = clean_text  # Fallback si on ne trouve pas l'original
 
         # Stats sur le texte original
-        tokens_before = [t.lower() for t in tokenizer.tokenize(original_text)]
+        tokens_before = simple_tokenize(original_text)
         total_tokens_before = len(tokens_before)
         char_count_before = len(original_text)
 
         # Stats sur le texte nettoyé
-        tokens_after = [t.lower() for t in tokenizer.tokenize(clean_text)]
+        tokens_after = simple_tokenize(clean_text)
         total_tokens_after = len(tokens_after)
         char_count_after = len(clean_text)
 

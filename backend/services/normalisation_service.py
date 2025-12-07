@@ -27,7 +27,7 @@ try:
         SPACY_LOADED = True
     except OSError:
         print("Warning: spaCy models not installed. Using fallback text processing.")
-except ImportError:
+except (ImportError, Exception) as e:
     print("Warning: spaCy not available. Using fallback text processing.")
 
 # Stopwords multilingues via stopwordsiso

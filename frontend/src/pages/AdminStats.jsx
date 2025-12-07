@@ -620,23 +620,21 @@ export function AdminStats() {
                 </div>
 
                 <div style={{ background: 'white', padding: '20px', borderRadius: '12px', border: '1px solid #e0e0e0' }}>
-                  <div style={{ fontSize: '13px', color: '#999', marginBottom: '8px' }}>📊 Taux de Compression</div>
+                  <div style={{ fontSize: '13px', color: '#999', marginBottom: '8px' }}>📄 Nombre de Documents</div>
                   <div style={{ fontSize: '24px', fontWeight: '700', color: '#f093fb' }}>
-                    {stats.total_size > 0 && stats.total_words > 0
-                      ? `${((stats.total_size / (stats.total_words * 5)) * 100).toFixed(1)}%`
-                      : '0%'}
+                    {stats.total_docs || 0}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#999', marginTop: '4px' }}>efficacité stockage</div>
+                  <div style={{ fontSize: '11px', color: '#999', marginTop: '4px' }}>fichiers importés</div>
                 </div>
 
                 <div style={{ background: 'white', padding: '20px', borderRadius: '12px', border: '1px solid #e0e0e0' }}>
-                  <div style={{ fontSize: '13px', color: '#999', marginBottom: '8px' }}>🎯 Richesse Lexicale</div>
+                  <div style={{ fontSize: '13px', color: '#999', marginBottom: '8px' }}>💾 Taille Totale</div>
                   <div style={{ fontSize: '24px', fontWeight: '700', color: '#43e97b' }}>
-                    {stats.top_words && stats.top_words.length > 0
-                      ? `${((stats.top_words.length / stats.total_words) * 100).toFixed(2)}%`
-                      : '0%'}
+                    {stats.total_size > 0
+                      ? `${(stats.total_size / (1024 * 1024)).toFixed(2)} MB`
+                      : '0 MB'}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#999', marginTop: '4px' }}>mots uniques</div>
+                  <div style={{ fontSize: '11px', color: '#999', marginTop: '4px' }}>corpus stocké</div>
                 </div>
               </div>
             </motion.div>
