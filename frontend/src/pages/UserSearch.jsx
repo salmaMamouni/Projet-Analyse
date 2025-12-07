@@ -99,27 +99,13 @@ export function UserSearch() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      style={{ padding: '40px 30px', maxWidth: '1400px', margin: '0 auto' }}
     >
       {/* Header */}
       <motion.div 
         variants={itemVariants}
-        style={{ marginBottom: '30px' }}
       >
-        <h1 style={{ 
-          fontSize: '2rem', 
-          fontWeight: '700', 
-          color: '#1f2937',
-          marginBottom: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px'
-        }}>
-          🔍 Recherche Documentaire
-        </h1>
-        <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
-          Explorez le corpus documentaire et trouvez les informations dont vous avez besoin
-        </p>
+        <h1>🔍 Recherche Documentaire</h1>
+        <p>Explorez le corpus documentaire et trouvez les informations dont vous avez besoin</p>
       </motion.div>
 
       {/* Search Bar */}
@@ -152,7 +138,7 @@ export function UserSearch() {
       {!loading && results.length > 0 && (
         <motion.div className="results-info" variants={itemVariants}>
           <p>
-            Environ <strong>{results.length}</strong> résultat(s) ({fileTypeStatsText})
+            ✨ Environ <strong>{results.length}</strong> résultat(s) trouvé(s) ({fileTypeStatsText})
           </p>
         </motion.div>
       )}
@@ -183,74 +169,45 @@ export function UserSearch() {
               key={idx}
               className="result-item"
               variants={itemVariants}
-              whileHover={{ y: -2, boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}
-              style={{
-                background: 'white',
-                borderRadius: '12px',
-                padding: '20px',
-                marginBottom: '16px',
-                border: '1px solid #e5e7eb',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                transition: 'all 0.3s ease'
-              }}
+              whileHover={{ y: -4 }}
             >
+              <div className="result-icon">📄</div>
               <div className="result-content">
-                <h3 style={{ 
-                  fontSize: '1.1rem', 
-                  fontWeight: '600', 
-                  color: '#1f2937', 
-                  marginBottom: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}>
-                  📄 {result.filename}
-                </h3>
-                <p style={{ 
-                  fontSize: '0.95rem', 
-                  color: '#6b7280', 
-                  lineHeight: '1.6',
-                  marginBottom: '12px'
-                }}>
-                  {result.preview || result.context?.substring(0, 300) + '...' || 'Aucun aperçu disponible'}
+                <h3 className="result-title">{result.filename}</h3>
+                <p className="result-text">
+                  {result.preview || result.context?.substring(0, 250) + '...' || 'Aucun aperçu disponible'}
                 </p>
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  flexWrap: 'wrap',
-                  gap: '16px', 
-                  fontSize: '0.85rem',
-                  color: '#9ca3af',
-                  marginBottom: '8px'
-                }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <div className="result-meta">
+                  <span className="result-date">
                     📅 {result.date_import ? new Date(result.date_import).toLocaleDateString('fr-FR') : 'Date inconnue'}
                   </span>
-                  <span>·</span>
-                  <span>Type: {result.type || 'unknown'}</span>
-                  <span>·</span>
-                  <span>Occurrences: {result.total_occurrences || 0}</span>
+                  <span className="result-type">{result.type || 'unknown'}</span>
+                  <span>📊 {result.total_occurrences || 0} occurrences</span>
                 </div>
                 {result.word_occurrences && Object.keys(result.word_occurrences).length > 0 && (
                   <div style={{ 
-                    marginTop: '12px', 
-                    padding: '10px 14px', 
+                    padding: '12px 16px', 
                     background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)', 
                     borderRadius: '8px',
-                    fontSize: '0.85rem',
+                    fontSize: '12px',
                     color: '#0369a1',
                     borderLeft: '3px solid #0ea5e9',
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    gap: '12px',
+                    marginTop: '12px',
+                    flexWrap: 'wrap'
                   }}>
                     <span>
                       <strong>Fréquences:</strong> {Object.entries(result.word_occurrences)
+                        .slice(0, 3)
                         .map(([word, count]) => `"${word}" (${count})`)
                         .join(', ')}
                     </span>
                     <motion.button
                       onClick={() => openWordCloud(result.filename)}
+                      className="result-action"
                       style={{
                         background: '#0ea5e9',
                         color: 'white',
@@ -260,7 +217,8 @@ export function UserSearch() {
                         fontSize: '12px',
                         cursor: 'pointer',
                         whiteSpace: 'nowrap',
-                        marginLeft: '12px'
+                        marginLeft: '0',
+                        alignSelf: 'center'
                       }}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -280,7 +238,7 @@ export function UserSearch() {
         <motion.div className="no-results" variants={itemVariants}>
           <div className="no-results-icon">🔍</div>
           <h2>Aucun résultat</h2>
-          <p>Nous n'avons trouvé aucun document correspondant à "{query}"</p>
+          <p>Nous n'avons trouvé aucun document correspondant à "<strong>{query}</strong>"</p>
           <p className="suggestion">Essayez d'autres mots-clés ou consultez la page d'accueil</p>
         </motion.div>
       )}
@@ -296,7 +254,10 @@ export function UserSearch() {
 
       {/* Word Cloud Modal */}
       {wordCloudModal && (
-        <div
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           style={{
             position: 'fixed',
             top: 0,
@@ -307,48 +268,61 @@ export function UserSearch() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 1000
+            zIndex: 1000,
+            backdropFilter: 'blur(4px)'
           }}
           onClick={() => setWordCloudModal(null)}
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             style={{
               background: 'white',
-              borderRadius: '16px',
-              padding: '24px',
+              borderRadius: '20px',
+              padding: '32px',
               maxWidth: '900px',
               width: '90%',
               maxHeight: '80vh',
               overflow: 'auto',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+              boxShadow: '0 25px 50px rgba(0,0,0,0.3)',
               position: 'relative'
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <button
+            <motion.button
               onClick={() => setWordCloudModal(null)}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               style={{
                 position: 'absolute',
                 top: '16px',
                 right: '16px',
-                background: 'transparent',
+                background: 'rgba(102, 126, 234, 0.1)',
                 border: 'none',
-                fontSize: '24px',
+                fontSize: '28px',
                 cursor: 'pointer',
-                color: '#666',
+                color: '#667eea',
                 lineHeight: 1,
-                padding: '4px 8px',
-                borderRadius: '4px',
-                transition: 'background 0.2s'
+                padding: '8px 12px',
+                borderRadius: '8px',
+                transition: 'all 0.2s',
+                width: '40px',
+                height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
-              onMouseEnter={(e) => e.target.style.background = '#f3f4f6'}
-              onMouseLeave={(e) => e.target.style.background = 'transparent'}
             >
               ✕
-            </button>
-            <h2 style={{ marginBottom: '20px', color: '#1f2937', fontSize: '1.5rem' }}>
+            </motion.button>
+            <h2 style={{ 
+              marginBottom: '24px', 
+              color: '#1f2937', 
+              fontSize: '1.75rem',
+              fontWeight: '800'
+            }}>
               ☁️ Nuage de mots - {wordCloudModal.filename}
             </h2>
             <div style={{ 
@@ -356,10 +330,10 @@ export function UserSearch() {
               flexWrap: 'wrap',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '12px',
+              gap: '16px',
               background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-              borderRadius: '12px',
-              padding: '30px',
+              borderRadius: '16px',
+              padding: '40px',
               border: '2px solid #e0e0e0',
               minHeight: '300px'
             }}>
@@ -370,22 +344,23 @@ export function UserSearch() {
                   
                   const maxValue = Math.max(...wordCloudModal.words.map(w => Array.isArray(w) ? w[1] : (w.count || w.value || 1)));
                   const minValue = Math.min(...wordCloudModal.words.map(w => Array.isArray(w) ? w[1] : (w.count || w.value || 1)));
-                  const fontSize = 14 + ((value - minValue) / (maxValue - minValue || 1)) * 34;
+                  const fontSize = 14 + ((value - minValue) / (maxValue - minValue || 1)) * 36;
                   
-                  const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
+                  const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a', '#feca57', '#ff6348'];
                   const color = colors[idx % colors.length];
                   return (
                     <motion.span
                       key={idx}
-                      whileHover={{ scale: 1.2 }}
+                      whileHover={{ scale: 1.2, rotate: 5 }}
                       style={{
                         fontSize: `${fontSize}px`,
-                        fontWeight: 'bold',
+                        fontWeight: '700',
                         color: color,
-                        padding: '4px 8px',
+                        padding: '6px 10px',
                         cursor: 'pointer',
                         transition: 'transform 0.2s',
-                        display: 'inline-block'
+                        display: 'inline-block',
+                        textShadow: '0 2px 8px rgba(0,0,0,0.1)'
                       }}
                       title={`${text}: ${value}`}
                     >
@@ -394,13 +369,19 @@ export function UserSearch() {
                   );
                 })
               ) : (
-                <p style={{ color: '#999', fontSize: '16px', fontWeight: '500' }}>
+                <p style={{ 
+                  color: '#999', 
+                  fontSize: '16px', 
+                  fontWeight: '600',
+                  width: '100%',
+                  textAlign: 'center'
+                }}>
                   Aucune donnée de mots disponible
                 </p>
               )}
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </motion.div>
   );
