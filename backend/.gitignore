@@ -1,0 +1,31 @@
+
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environment
+.venv/
+ENV/
+env/
+*data
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Data files
+data/
+data/temp_texts.json
+*.db
+*.sqlite
+
+# Generated wordclouds
+static/wordclouds/
+*.png
+
+# Logs
+*.log

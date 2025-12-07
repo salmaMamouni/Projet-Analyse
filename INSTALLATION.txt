@@ -1,0 +1,110 @@
+═══════════════════════════════════════════════════════════════════════════
+  GUIDE D'INSTALLATION ET DE LANCEMENT - PROJET ANALYSE TEXTUELLE
+═══════════════════════════════════════════════════════════════════════════
+
+📋 PRÉREQUIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Python 3.8 ou supérieur
+- Node.js 14 ou supérieur
+- npm ou yarn
+- Git
+
+
+🔧 ÉTAPE 1 : CLONER LE PROJET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+git clone https://github.com/AmineBoussaid/test.git
+cd test
+cd "Projet Analyse"
+
+
+🐍 ÉTAPE 2 : CONFIGURATION DU BACKEND (Python/Flask)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Naviguer vers le dossier backend :
+   cd backend
+
+2. Créer un environnement virtuel Python :
+   python -m venv .venv
+
+3. Activer l'environnement virtuel :
+   
+   Sur Windows (CMD) :
+   .venv\Scripts\activate
+
+4. Installer les dépendances Python :
+   pip install -r requirements.txt
+
+5. Lancer le serveur backend Flask :
+   python app.py
+
+   ✅ Le backend sera accessible sur : http://localhost:5000
+
+
+⚛️ ÉTAPE 3 : CONFIGURATION DU FRONTEND (React)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Ouvrir un NOUVEAU terminal
+
+2. Naviguer vers le dossier frontend :
+   cd frontend
+
+3. Installer les dépendances Node.js :
+   npm install
+
+4. Lancer le serveur de développement React :
+   npm start
+
+   ✅ Le frontend sera accessible sur : http://localhost:3000
+   ✅ Le navigateur s'ouvrira automatiquement
+
+
+🚀 LANCEMENT RAPIDE (APRÈS INSTALLATION)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 Terminal 1 - BACKEND :
+─────────────────────────
+cd "Projet Analyse/backend"
+.\.venv\Scripts\Activate.ps1
+python app.py
+
+
+📌 Terminal 2 - FRONTEND :
+──────────────────────────
+cd "Projet Analyse/frontend"
+npm start
+
+
+🔑 CONNEXION À L'APPLICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+L'application utilise un système de connexion simple :
+
+- Choisir "Administrateur" pour :
+  ✓ Importer des documents
+  ✓ Gérer les documents
+  ✓ Voir les statistiques
+
+- Choisir "Utilisateur" pour :
+  ✓ Rechercher dans les documents
+  ✓ Explorer les résultats
+
+
+📦 STRUCTURE DES DOSSIERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+backend/
+  ├── app.py                    # Serveur Flask principal
+  ├── requirements.txt          # Dépendances Python
+  ├── controllers/              # Contrôleurs API
+  ├── services/                 # Logique métier
+  ├── data/                     # Données (ignoré par Git)
+  │   ├── corpus/               # Documents originaux
+  │   └── processed/            # Textes traités
+  └── static/                   # Fichiers statiques
+
+frontend/
+  ├── package.json              # Dépendances Node.js
+  ├── public/                   # Fichiers publics
+  └── src/                      # Code source React
+      ├── components/           # Composants réutilisables
+      ├── pages/                # Pages principales
+      └── api/                  # Appels API
+
