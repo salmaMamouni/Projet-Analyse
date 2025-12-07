@@ -162,13 +162,6 @@ export function AdminStats() {
                 lightColor: '#faf0ff'
               },
               {
-                icon: '📊',
-                label: 'Mots/Document',
-                value: stats.total_docs > 0 ? Math.round(stats.total_words / stats.total_docs) : 0,
-                color: '#4facfe',
-                lightColor: '#e6f7ff'
-              },
-              {
                 icon: '📈',
                 label: 'Taille Moyenne',
                 value: stats.total_docs > 0 && stats.total_size > 0
@@ -520,124 +513,6 @@ export function AdminStats() {
               </motion.div>
             )}
 
-            {/* Timeline Statistics */}
-            {stats.by_date && stats.by_date.labels && stats.by_date.labels.length > 0 && (
-              <motion.div
-                variants={itemVariants}
-                className="chart-card"
-                style={{
-                  background: 'white',
-                  borderRadius: '16px',
-                  padding: '28px',
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
-                  border: '1px solid #f0f0f0',
-                  marginBottom: '30px'
-                }}
-              >
-                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', marginTop: 0, marginBottom: '20px' }}>
-                  📅 Activité d'Import par Date
-                </h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {stats.by_date.labels.map((date, idx) => {
-                    const count = stats.by_date.data[idx];
-                    const maxCount = Math.max(...stats.by_date.data);
-                    const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
-                    
-                    return (
-                      <motion.div
-                        key={date}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.05 }}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '16px'
-                        }}
-                      >
-                        <div style={{ minWidth: '100px', fontSize: '13px', color: '#666', fontWeight: '500' }}>
-                          {new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                        </div>
-                        <div style={{ flex: 1, position: 'relative', height: '32px', background: '#f5f5f5', borderRadius: '8px', overflow: 'hidden' }}>
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${percentage}%` }}
-                            transition={{ duration: 0.8, delay: idx * 0.05 }}
-                            style={{
-                              height: '100%',
-                              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                              borderRadius: '8px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              paddingLeft: '12px'
-                            }}
-                          >
-                            <span style={{ color: 'white', fontSize: '12px', fontWeight: '600' }}>
-                              {count} fichier{count > 1 ? 's' : ''}
-                            </span>
-                          </motion.div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Performance Metrics */}
-            <motion.div
-              variants={itemVariants}
-              className="chart-card"
-              style={{
-                background: 'linear-gradient(135deg, #667eea15 0%, #764ba215 100%)',
-                borderRadius: '16px',
-                padding: '28px',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
-                border: '2px solid #667eea30',
-                marginBottom: '30px'
-              }}
-            >
-              <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', marginTop: 0, marginBottom: '20px' }}>
-                ⚡ Métriques de Performance
-              </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
-                <div style={{ background: 'white', padding: '20px', borderRadius: '12px', border: '1px solid #e0e0e0' }}>
-                  <div style={{ fontSize: '13px', color: '#999', marginBottom: '8px' }}>📖 Densité de Contenu</div>
-                  <div style={{ fontSize: '24px', fontWeight: '700', color: '#667eea' }}>
-                    {stats.total_docs > 0 && stats.total_size > 0
-                      ? `${(stats.total_words / (stats.total_size / 1024)).toFixed(2)}`
-                      : '0'}
-                  </div>
-                  <div style={{ fontSize: '11px', color: '#999', marginTop: '4px' }}>mots par Ko</div>
-                </div>
-
-                <div style={{ background: 'white', padding: '20px', borderRadius: '12px', border: '1px solid #e0e0e0' }}>
-                  <div style={{ fontSize: '13px', color: '#999', marginBottom: '8px' }}>📚 Diversité de Format</div>
-                  <div style={{ fontSize: '24px', fontWeight: '700', color: '#764ba2' }}>
-                    {Object.keys(stats.by_type).length}
-                  </div>
-                  <div style={{ fontSize: '11px', color: '#999', marginTop: '4px' }}>types différents</div>
-                </div>
-
-                <div style={{ background: 'white', padding: '20px', borderRadius: '12px', border: '1px solid #e0e0e0' }}>
-                  <div style={{ fontSize: '13px', color: '#999', marginBottom: '8px' }}>📄 Nombre de Documents</div>
-                  <div style={{ fontSize: '24px', fontWeight: '700', color: '#f093fb' }}>
-                    {stats.total_docs || 0}
-                  </div>
-                  <div style={{ fontSize: '11px', color: '#999', marginTop: '4px' }}>fichiers importés</div>
-                </div>
-
-                <div style={{ background: 'white', padding: '20px', borderRadius: '12px', border: '1px solid #e0e0e0' }}>
-                  <div style={{ fontSize: '13px', color: '#999', marginBottom: '8px' }}>💾 Taille Totale</div>
-                  <div style={{ fontSize: '24px', fontWeight: '700', color: '#43e97b' }}>
-                    {stats.total_size > 0
-                      ? `${(stats.total_size / (1024 * 1024)).toFixed(2)} MB`
-                      : '0 MB'}
-                  </div>
-                  <div style={{ fontSize: '11px', color: '#999', marginTop: '4px' }}>corpus stocké</div>
-                </div>
-              </div>
-            </motion.div>
           </motion.div>
 
           {/* Refresh Button */}

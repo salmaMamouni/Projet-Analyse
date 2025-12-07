@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import SearchResults from "../components/SearchResults";
+import "./IndexationView.css";
 
 export default function IndexationView() {
   const [results, setResults] = useState([]);
@@ -9,11 +11,23 @@ export default function IndexationView() {
   const [mode, setMode] = useState('all_words_and');
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [availableTypes, setAvailableTypes] = useState([]);
+  const [error, setError] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  React.useEffect(() => {
+  const totalResults = Array.isArray(results)
+    ? results.length
+    : (results && typeof results === "object" ? Object.keys(results).length : 0);
+
+  const modeLabels = {
+    all_words_and: "Tous les mots",
+    or: "Au moins un mot",
+    exact: "Expression exacte"
+  };
+
+  useEffect(() => {
     const fetchTypes = async () => {
       try {
-        const response = await fetch('/api/documents');
+        const response = await fetch('/api/documents', { headers: { 'X-Role': 'user' } });
         const docs = await response.json();
         const types = [...new Set(docs.map(d => d.type).filter(Boolean))];
         setAvailableTypes(types);
@@ -24,35 +38,67 @@ export default function IndexationView() {
     fetchTypes();
   }, []);
 
-  const handleSearch = async (q, mode) => {
-    setQuery(q);
-    setMode(mode || 'all_words_and');
+  useEffect(() => {
+    const initialQuery = searchParams.get('q');
+    const initialMode = searchParams.get('mode') || 'all_words_and';
+    const initialTypes = searchParams.get('types');
+
+    if (initialTypes) {
+      setSelectedTypes(initialTypes.split(',').filter(Boolean));
+    }
+
+    if (initialQuery) {
+      setQuery(initialQuery);
+      setMode(initialMode);
+      handleSearch(initialQuery, initialMode, true, initialTypes ? initialTypes.split(',').filter(Boolean) : null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!query) return;
+    handleSearch(query, mode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTypes]);
+
+  const handleSearch = async (q, nextMode = mode, skipUrlUpdate = false, typesOverride = null) => {
+    const trimmedQuery = (q || '').trim();
+    if (!trimmedQuery) return;
+
+    const appliedMode = nextMode || 'all_words_and';
+    const appliedTypes = Array.isArray(typesOverride) ? typesOverride : selectedTypes;
+
+    setQuery(trimmedQuery);
+    setMode(appliedMode);
     setLoading(true);
+    setError(null);
+
     try {
-      const typesParam = selectedTypes.length > 0 ? `&types=${selectedTypes.join(',')}` : '';
+      const typesParam = appliedTypes.length > 0 ? `&types=${appliedTypes.join(',')}` : '';
       const response = await fetch(
-        `/api/search?q=${encodeURIComponent(q)}&mode=${mode || 'all_words_and'}${typesParam}`,
+        `/api/search?q=${encodeURIComponent(trimmedQuery)}&mode=${appliedMode}${typesParam}`,
         { headers: { 'X-Role': 'user' } }
       );
       const data = await response.json();
       setResults(data.results || []);
+
+      if (!skipUrlUpdate) {
+        const nextParams = { q: trimmedQuery, mode: appliedMode };
+        if (appliedTypes.length > 0) nextParams.types = appliedTypes.join(',');
+        setSearchParams(nextParams);
+      }
     } catch (err) {
       console.error("Erreur de recherche :", err);
+      setError("Recherche impossible pour le moment. Merci de réessayer.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
-    <div className="container-fluid" style={{ minHeight: '100vh', background: '#fff' }}>
-      <div style={{ 
-        padding: '20px 40px', 
-        borderBottom: results.length > 0 ? '1px solid #ebebeb' : 'none'
-      }}>
-        <div className="d-flex align-items-center justify-content-between mb-3">
-          <h4 className="mb-0" style={{ color: '#4285f4', fontWeight: '400' }}>Projet Analyse</h4>
-        </div>
-        
-        <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+    <div className="user-search-page">
+      <div className="search-shell">
+        <div className="search-card">
           <SearchBar
             onSearch={handleSearch}
             inputValue={query}
@@ -60,30 +106,30 @@ export default function IndexationView() {
             modeValue={mode}
             onModeChange={(m) => setMode(m)}
           />
-          
+
           {availableTypes.length > 0 && (
-            <div className="mt-3" style={{ fontSize: '0.9rem' }}>
-              <div className="d-flex flex-wrap gap-2 align-items-center">
-                <span style={{ color: '#5f6368', fontWeight: '500' }}>Type de document:</span>
+            <div className="type-filter">
+              <p className="label">Type de document</p>
+              <div className="chip-row">
                 <button
-                  className={`btn btn-sm ${selectedTypes.length === 0 ? 'btn-primary' : 'btn-outline-secondary'}`}
+                  type="button"
+                  className={`chip ${selectedTypes.length === 0 ? 'chip-active' : ''}`}
                   onClick={() => setSelectedTypes([])}
-                  style={{ borderRadius: '20px', fontSize: '0.85rem', padding: '4px 12px' }}
                 >
                   Tous
                 </button>
-                {availableTypes.map(type => (
+                {availableTypes.map((type) => (
                   <button
                     key={type}
-                    className={`btn btn-sm ${selectedTypes.includes(type) ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    type="button"
+                    className={`chip ${selectedTypes.includes(type) ? 'chip-active' : ''}`}
                     onClick={() => {
-                      setSelectedTypes(prev => 
-                        prev.includes(type) 
-                          ? prev.filter(t => t !== type)
+                      setSelectedTypes((prev) =>
+                        prev.includes(type)
+                          ? prev.filter((t) => t !== type)
                           : [...prev, type]
                       );
                     }}
-                    style={{ borderRadius: '20px', fontSize: '0.85rem', padding: '4px 12px' }}
                   >
                     {type}
                   </button>
@@ -92,26 +138,40 @@ export default function IndexationView() {
             </div>
           )}
         </div>
-      </div>
 
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '20px 60px' }}>
-        {loading ? (
-          <div className="text-center text-muted mt-5">
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Chargement...</span>
+        <div className="results-panel">
+          {error && <div className="error-banner">{error}</div>}
+
+          {loading ? (
+            <div className="loading-block">
+              <div className="spinner" aria-hidden />
+              <p>Recherche en cours...</p>
             </div>
-          </div>
-        ) : (
-          <SearchResults
-            results={results}
-            query={query}
-            onWordClick={(word) => {
-              const newQuery = query ? `${query} ${word}` : word;
-              setQuery(newQuery);
-              handleSearch(newQuery, mode);
-            }}
-          />
-        )}
+          ) : (
+            <>
+              {query && (
+                <div className="results-header">
+                  <div>
+                    <p className="label">Résultats</p>
+                    <h4>{totalResults} document{totalResults > 1 ? 's' : ''} trouvé{totalResults > 1 ? 's' : ''}</h4>
+                    <p className="muted">
+                      Mode : {modeLabels[mode] || mode} · {selectedTypes.length > 0 ? `Types : ${selectedTypes.join(', ')}` : 'Tous les types'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <SearchResults
+                results={results}
+                query={query}
+                onWordClick={(word) => {
+                  const newQuery = query ? `${query} ${word}` : word;
+                  setQuery(newQuery);
+                }}
+              />
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

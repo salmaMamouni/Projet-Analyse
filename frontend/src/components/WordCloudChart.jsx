@@ -1,12 +1,12 @@
 import React from "react";
 
-export default function WordCloudChart({ words = [] }) {
+export default function WordCloudChart({ words = [], onWordClick = null }) {
   if (!words || words.length === 0)
     return <p className="text-muted text-center">Aucun mot à afficher.</p>;
 
-  const sortedWords = words
+  const sortedWords = [...words]
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 100);
+    .slice(0, 30);
 
   if (sortedWords.length === 0) {
     return <p className="text-muted text-center">Aucun mot à afficher.</p>;
@@ -52,7 +52,7 @@ export default function WordCloudChart({ words = [] }) {
             fontWeight: "600",
             color: getColor(index),
             whiteSpace: "nowrap",
-            cursor: "default",
+            cursor: onWordClick ? "pointer" : "default",
             transition: "all 0.2s ease",
             padding: "4px 8px",
             borderRadius: "4px"
@@ -64,6 +64,9 @@ export default function WordCloudChart({ words = [] }) {
           onMouseLeave={(e) => {
             e.target.style.opacity = "1";
             e.target.style.transform = "scale(1)";
+          }}
+          onClick={() => {
+            if (onWordClick) onWordClick(word);
           }}
           title={`${word}: ${count} occurrence${count > 1 ? 's' : ''}`}
         >

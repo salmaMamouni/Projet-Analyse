@@ -79,22 +79,13 @@ export default function SearchBar({ onSearch, inputValue = null, onInputChange =
   };
 
   return (
-    <form onSubmit={handleSubmit} className="d-flex justify-content-center align-items-center flex-wrap gap-2">
-      <div ref={wrapperRef} style={{ position: 'relative', flex: '1', maxWidth: '600px' }}>
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center',
-          border: '1px solid #dfe1e5',
-          borderRadius: '24px',
-          padding: '5px 15px',
-          boxShadow: '0 1px 6px rgba(32,33,36,.28)',
-          background: 'white'
-        }}>
-          <span style={{ color: '#9aa0a6', fontSize: '1.2rem', marginRight: '10px' }}>🔍</span>
+    <form onSubmit={handleSubmit} className="searchbar-shell">
+      <div ref={wrapperRef} className="searchbar-input-wrap">
+        <div className="searchbar-input">
+          <span className="searchbar-icon">🔍</span>
           <input
             type="text"
-            className="form-control border-0"
-            placeholder="Rechercher..."
+            placeholder="Rechercher un document..."
             value={currentInput}
             onChange={(e) => {
               if (onInputChange) onInputChange(e.target.value);
@@ -103,54 +94,28 @@ export default function SearchBar({ onSearch, inputValue = null, onInputChange =
             }}
             onKeyDown={handleKeyDown}
             autoComplete="off"
-            style={{ boxShadow: 'none', outline: 'none', padding: '5px 0' }}
           />
           <button 
             type="submit" 
-            className="btn btn-link p-0 ms-2"
-            style={{ color: '#4285f4', fontSize: '1.2rem', textDecoration: 'none' }}
+            className="searchbar-submit"
           >
-            ▶
+            Rechercher
           </button>
         </div>
         {showSuggestions && suggestions.length > 0 && (
-          <ul style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            right: 0,
-            background: 'white',
-            border: '1px solid #dfe1e5',
-            borderRadius: '0 0 24px 24px',
-            boxShadow: '0 4px 6px rgba(32,33,36,.28)',
-            listStyle: 'none',
-            margin: 0,
-            padding: '8px 0',
-            maxHeight: '300px',
-            overflowY: 'auto',
-            zIndex: 1000,
-            marginTop: '-8px'
-          }}>
+          <ul className="searchbar-suggestions">
             {suggestions.map((s, idx) => {
               const isExactMatch = s.toLowerCase().startsWith(currentInput.toLowerCase());
               return (
                 <li
                   key={idx}
                   onClick={() => handleSuggestionClick(s)}
-                  style={{
-                    padding: '8px 20px',
-                    cursor: 'pointer',
-                    background: idx === activeSuggestionIndex ? '#f0f0f0' : 'white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    fontSize: '0.95rem'
-                  }}
+                  className={idx === activeSuggestionIndex ? 'active' : ''}
                   onMouseEnter={() => setActiveSuggestionIndex(idx)}
                 >
-                  <span style={{ color: '#9aa0a6' }}>🔍</span>
+                  <span className="searchbar-icon muted">🔍</span>
                   <span>{s}</span>
-                  {!isExactMatch && <span style={{fontSize:'0.7rem', color:'#f59e0b', marginLeft: 'auto'}}>correction</span>}
+                  {!isExactMatch && <span className="hint">correction</span>}
                 </li>
               );
             })}
@@ -159,15 +124,7 @@ export default function SearchBar({ onSearch, inputValue = null, onInputChange =
       </div>
 
       <select
-        className="form-select"
-        style={{ 
-          maxWidth: "200px",
-          border: '1px solid #dfe1e5',
-          borderRadius: '24px',
-          padding: '8px 16px',
-          fontSize: '0.9rem',
-          color: '#5f6368'
-        }}
+        className="searchbar-mode"
         value={currentMode}
         onChange={(e) => {
           if (onModeChange) onModeChange(e.target.value);

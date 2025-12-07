@@ -7,7 +7,6 @@ import {
   FileText, 
   Search, 
   LogOut,
-  Home,
   Menu,
   X
 } from 'lucide-react';
@@ -17,14 +16,12 @@ export default function Sidebar({ role, onLogout, isOpen, toggleSidebar }) {
   const location = useLocation();
 
   const adminLinks = [
-    { path: '/admin', label: 'Accueil', icon: Home },
     { path: '/admin/import', label: 'Importer', icon: Upload },
     { path: '/admin/manage', label: 'Gérer les Documents', icon: FileText },
     { path: '/admin/stats', label: 'Statistiques', icon: BarChart3 },
   ];
 
   const userLinks = [
-    { path: '/user', label: 'Accueil', icon: Home },
     { path: '/user/search', label: 'Rechercher', icon: Search },
   ];
 

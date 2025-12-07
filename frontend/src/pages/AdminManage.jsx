@@ -25,6 +25,7 @@ export function AdminManage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
   
   const fetchFiles = useCallback(async () => {
     setLoading(true);
@@ -257,6 +258,18 @@ export function AdminManage() {
     visible: { opacity: 1, x: 0, transition: { duration: 0.3 } },
   };
 
+  // Pagination logic
+  const itemsPerPage = 8;
+  const paginatedFiles = React.useMemo(() => {
+    const indexOfLast = currentPage * itemsPerPage;
+    const indexOfFirst = indexOfLast - itemsPerPage;
+    return sortedFiles.slice(indexOfFirst, indexOfLast);
+  }, [sortedFiles, currentPage]);
+
+  const totalPages = Math.ceil(sortedFiles.length / itemsPerPage);
+  const hasNextPage = currentPage < totalPages;
+  const hasPrevPage = currentPage > 1;
+
   return (
     <motion.div 
       className="admin-manage"
@@ -286,7 +299,10 @@ export function AdminManage() {
           type="text"
           placeholder="🔍 Rechercher un fichier ou un terme..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setCurrentPage(1);
+          }}
           className="search-input"
           style={{
             width: '100%',
@@ -460,7 +476,7 @@ export function AdminManage() {
                 </tr>
               </thead>
               <tbody>
-                {sortedFiles.map((file, idx) => (
+                {paginatedFiles.map((file, idx) => (
                   <motion.tr 
                     key={idx} 
                     className="file-row"
@@ -557,6 +573,105 @@ export function AdminManage() {
               </tbody>
             </table>
           </motion.div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '12px',
+                marginTop: '24px',
+                padding: '20px',
+                background: 'white',
+                borderRadius: '10px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+              }}
+            >
+              <motion.button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={!hasPrevPage}
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  border: '1px solid #e0e0e0',
+                  background: hasPrevPage ? 'white' : '#f5f5f5',
+                  color: hasPrevPage ? '#333' : '#999',
+                  cursor: hasPrevPage ? 'pointer' : 'not-allowed',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease'
+                }}
+                whileHover={hasPrevPage ? { scale: 1.05, background: '#f9fafb' } : {}}
+                whileTap={hasPrevPage ? { scale: 0.98 } : {}}
+              >
+                ← Précédent
+              </motion.button>
+
+              <div style={{
+                display: 'flex',
+                gap: '8px',
+                alignItems: 'center'
+              }}>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <motion.button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      border: page === currentPage ? '2px solid #667eea' : '1px solid #e0e0e0',
+                      background: page === currentPage ? '#667eea' : 'white',
+                      color: page === currentPage ? 'white' : '#333',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontWeight: page === currentPage ? '600' : '500',
+                      minWidth: '36px',
+                      textAlign: 'center'
+                    }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {page}
+                  </motion.button>
+                ))}
+              </div>
+
+              <motion.button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={!hasNextPage}
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  border: '1px solid #e0e0e0',
+                  background: hasNextPage ? 'white' : '#f5f5f5',
+                  color: hasNextPage ? '#333' : '#999',
+                  cursor: hasNextPage ? 'pointer' : 'not-allowed',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease'
+                }}
+                whileHover={hasNextPage ? { scale: 1.05, background: '#f9fafb' } : {}}
+                whileTap={hasNextPage ? { scale: 0.98 } : {}}
+              >
+                Suivant →
+              </motion.button>
+
+              <div style={{
+                marginLeft: '12px',
+                paddingLeft: '12px',
+                borderLeft: '1px solid #e0e0e0',
+                color: '#666',
+                fontSize: '13px',
+                fontWeight: '500'
+              }}>
+                Page {currentPage} / {totalPages}
+              </div>
+            </motion.div>
+          )}
         </motion.div>
       )}
 
